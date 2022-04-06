@@ -1,6 +1,6 @@
 from http import HTTPStatus
-from http.client import BAD_REQUEST
 from sqlite3 import IntegrityError
+from click import MissingParameter
 from sqlalchemy.exc import IntegrityError
 from flask import request
 from app.configs.database import db
@@ -11,7 +11,12 @@ def register_vacination():
     
     expected_keys = {"cpf", "name", "vaccine_name", "health_unit_name"}
     data = request.get_json()
-    
+
+    for value in list(data.values()):
+        if type(value) != str:
+            return {"error": "Values must be strings"}, HTTPStatus.BAD_REQUEST
+        
+        
     try: 
         validate_keys(data, expected_keys)
         card = VacineModel(**data)
@@ -19,18 +24,19 @@ def register_vacination():
         db.session.add(card)
         db.session.commit()
 
-    except TypeError:
-        return {
-            f"error": "You must enter string values to {expected_keys keys}"
-        }
+    except MissingParameter as e:
+        return e.args[0], HTTPStatus.BAD_REQUEST
     
     except KeyError as e:
-        return e.args[0], HTTPStatus.UNPROCESSABLE_ENTITY
+        return e.args[0], HTTPStatus.BAD_REQUEST
 
     except IntegrityError as e:
-        return {
-            "error": "CPF must be 11 numbers and unique"
-        }, HTTPStatus.UNPROCESSABLE_ENTITY
+         return {
+             "error": "CPF already registered"
+        }, HTTPStatus.CONFLICT
+
+    if len(data["cpf"]) != 11:
+            return {"error": "cpf must contain 11 digits"}, HTTPStatus.BAD_REQUEST
 
     return {
             "cpf": card.cpf,
@@ -50,7 +56,6 @@ def vacine_registers():
 
     serializer = [
         {
-            "vacine_id": data.id,
             "cpf": data.cpf,
             "name": data.name,
             "vaccine_name": data.vaccine_name,

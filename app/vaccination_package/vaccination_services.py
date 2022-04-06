@@ -1,8 +1,13 @@
+from click import MissingParameter
+
+
 def validate_keys(payload: dict, expected_keys: set):
 
     body_keys = set(payload.keys())
     
     invalid_keys = body_keys - expected_keys
+
+    missing_keys = len(body_keys) - len(expected_keys)
 
     if invalid_keys:
         raise KeyError(
@@ -13,8 +18,13 @@ def validate_keys(payload: dict, expected_keys: set):
             }
         )
 
-    for key in body_keys:
-        if type(key) != str:
-            raise KeyError(
-            {"error": "All keys must be strings"}
-        )    
+    if missing_keys != 0:
+        raise MissingParameter(
+            {
+                "error": "missing_keys",
+                "expected": list(expected_keys),
+                "received": list(body_keys)
+            }
+        )
+
+        
