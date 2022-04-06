@@ -1,15 +1,22 @@
 from datetime import datetime, timedelta
+import sqlalchemy.types as types 
 from app.configs.database import db
 from sqlalchemy import Column, String, DateTime
+
+class LowerCaseText(types.TypeDecorator):
+    impl = types.Text
+
+    def process_bind_param(self, value, dialect) -> None:
+        return value.upper()
 
 class VacineModel(db.Model):
 
     __tablename__ = "vaccine_cards"
 
-    cpf: str = Column(String(length=11), primary_key=True)
-    name: str = Column(String(50), nullable=False)
-    vaccine_name: str = Column(String(50), nullable=False)
-    health_unit_name: str = Column(String(50))
+    cpf: str = Column(String, primary_key=True)
+    name: str = Column(LowerCaseText, nullable=False)
+    vaccine_name: str = Column(LowerCaseText, nullable=False)
+    health_unit_name: str = Column(LowerCaseText)
     first_shot_date: str = Column(DateTime, default=datetime.now())
     second_shot_date: str = Column(DateTime, default=datetime.now() + timedelta(90))
 
