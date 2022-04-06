@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 import sqlalchemy.types as types 
 from app.configs.database import db
@@ -9,6 +10,7 @@ class LowerCaseText(types.TypeDecorator):
     def process_bind_param(self, value, dialect) -> None:
         return value.upper()
 
+@dataclass
 class VacineModel(db.Model):
 
     __tablename__ = "vaccine_cards"
