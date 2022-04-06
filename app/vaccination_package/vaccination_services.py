@@ -18,7 +18,7 @@ def validate_keys(payload: dict, expected_keys: set):
             }
         )
 
-    if missing_keys != 0:
+    if missing_keys < 0:
         raise MissingParameter(
             {
                 "error": "missing_keys",

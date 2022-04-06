@@ -15,9 +15,11 @@ def register_vacination():
     for value in list(data.values()):
         if type(value) != str:
             return {"error": "Values must be strings"}, HTTPStatus.BAD_REQUEST
-        
-        
+            
     try: 
+        if len(data["cpf"]) != 11:
+            return {"error": "cpf must contain 11 digits"}, HTTPStatus.BAD_REQUEST
+
         validate_keys(data, expected_keys)
         card = VacineModel(**data)
 
@@ -34,9 +36,6 @@ def register_vacination():
          return {
              "error": "CPF already registered"
         }, HTTPStatus.CONFLICT
-
-    if len(data["cpf"]) != 11:
-            return {"error": "cpf must contain 11 digits"}, HTTPStatus.BAD_REQUEST
 
     return {
             "cpf": card.cpf,
