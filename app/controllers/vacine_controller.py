@@ -4,6 +4,7 @@ from click import MissingParameter
 from sqlalchemy.exc import IntegrityError
 from flask import request
 from app.configs.database import db
+from app.exc.vaccine_exc import InvalidCPF
 from app.models.vacine_model import VacineModel
 from app.vaccination_package.vaccination_services import validate_keys
 
@@ -17,14 +18,14 @@ def register_vacination():
             return {"error": "Values must be strings"}, HTTPStatus.BAD_REQUEST
             
     try: 
-        if len(data["cpf"]) != 11:
-            return {"error": "cpf must contain 11 digits"}, HTTPStatus.BAD_REQUEST
-
         validate_keys(data, expected_keys)
         card = VacineModel(**data)
 
         db.session.add(card)
         db.session.commit()
+
+    except InvalidCPF:
+        return {"error": "CPF must be 11 digits"}, HTTPStatus.BAD_REQUEST
 
     except MissingParameter as e:
         return e.args[0], HTTPStatus.BAD_REQUEST

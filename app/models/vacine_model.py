@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import sqlalchemy.types as types 
 from app.configs.database import db
 from sqlalchemy import Column, String, DateTime
+from sqlalchemy.orm import validates
+
+from app.exc.vaccine_exc import InvalidCPF
 
 class TitleText(types.TypeDecorator):
     impl = types.Text
@@ -23,4 +26,8 @@ class VacineModel(db.Model):
     second_shot_date: str = Column(DateTime, default=datetime.now() + timedelta(90))
 
 
-    
+    @validates("cpf")
+    def validate_cpf(self, _, cpf_to_be_tested):
+        if len(cpf_to_be_tested) != 11:
+            raise InvalidCPF
+        return cpf_to_be_tested
