@@ -19,9 +19,9 @@ class VacineModel(db.Model):
     __tablename__ = "vaccine_cards"
 
     cpf: str = Column(String, primary_key=True)
-    name: str = Column(TitleText, nullable=False)
-    vaccine_name: str = Column(TitleText, nullable=False)
-    health_unit_name: str = Column(TitleText)
+    name: str = Column(String, nullable=False)
+    vaccine_name: str = Column(String, nullable=False)
+    health_unit_name: str = Column(String)
     first_shot_date: str = Column(DateTime, default=datetime.now())
     second_shot_date: str = Column(DateTime, default=datetime.now() + timedelta(90))
 
